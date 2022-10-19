@@ -52,13 +52,13 @@ if __name__ == '__main__':
                     f.write('\n')
             print("Setup wrote in setup.sh")
         if generate_workload_command:
-            vmworkload_generator = VmWorkloadGenerator(slice_duration=generate_workload_slice, scope_duration=generate_workload_scope, number_of_scope=4, vm_workload_details=node_generator.get_workload_details())
-            # with open('workload.sh', 'w') as f:
-            #     for x in vm_list:
-            #         f.write(vmworkload_generator.generate_workload_for_VM(vm_list[0]))
-            #         f.write('\n')
-            vmworkload_generator.generate_workload_for_VM(vm_list[0])
-            vmworkload_generator.generate_workload_for_VM(vm_list[-1])
+            vmworkload_generator = VmWorkloadGenerator(slice_duration=generate_workload_slice, scope_duration=generate_workload_scope, number_of_scope=3, vm_workload_details=node_generator.get_workload_details())
+            with open('workload.sh', 'w') as f:
+                for x in vm_list:
+                    f.write(vmworkload_generator.generate_workload_for_VM(x))
+                    f.write('\n')
+            # vmworkload_generator.generate_workload_for_VM(vm_list[0])
+            # vmworkload_generator.generate_workload_for_VM(vm_list[-1])
             print("Workload wrote in workload.sh")
     except KeyboardInterrupt:
         print("Program interrupted")

@@ -1,5 +1,6 @@
 from random import randrange
 from enum import Enum
+from .vmsliceworkload import VmSliceWorkloadIdle, VmSliceWorkloadStressNG, VmSliceWorkloadWordpress
 
 class VmWorkloadType(Enum):
     LOW = 0
@@ -10,16 +11,20 @@ class VmWorkloadType(Enum):
 class VmModel(object):
 
     vmcount = 0
-    diurnal_workload = ["stressng","wordpress"]
-    nodiurnal_workload = ["idle"] + diurnal_workload
+    diurnal_workload = ["stressng", "stressng"] #,"wordpress"]
+    # nodiurnal_workload = ["idle"] + diurnal_workload
+    nodiurnal_workload = diurnal_workload
+    generator = {"idle" : VmSliceWorkloadIdle(), 
+            "stressng" : VmSliceWorkloadStressNG(),} 
+            # "wordpress" : VmSliceWorkloadWordpress()}
 
     def __init__(self, cpu : int, mem : int, workload_intensity : VmWorkloadType, diurnal : bool):
         VmModel.vmcount+=1
         self.vm_name="vm" + str(VmModel.vmcount)
-        self.sshheader = "vmssh " + self.vm_name + " -o StrictHostKeyChecking=no \"{data}\""
         self.cpu=cpu
         self.mem=mem
-        self.workload_intensity=workload_intensity
+        #self.workload_intensity=workload_intensity
+        self.workload_intensity=VmWorkloadType.MEDIUM_HIGH
         self.diurnal=diurnal
         if diurnal:
             self.workload = VmModel.diurnal_workload[randrange(len(VmModel.diurnal_workload))]

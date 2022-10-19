@@ -12,7 +12,7 @@ class NodeGenerator(object):
         self.vm_workload_details[VmWorkloadType.MEDIUM_LOW] =  {"avg": (3,12), "per" : (25,60)  }
         self.vm_workload_details[VmWorkloadType.MEDIUM_HIGH] =  {"avg": (12,25), "per" : (60,90)  }
         self.vm_workload_details[VmWorkloadType.HIGH] =  {"avg": (25,90), "per" : (90,100)  }
-        self.vm_cpu_distribution = [0.6, 0.2, 0.2, 0.1] # Sum must be 1
+        self.vm_cpu_distribution = [0.5, 0.2, 0.2, 0.1] # Sum must be 1
         self.vm_cpu_config       = [1, 2, 4, 8] # In cores
         self.vm_mem_distribution = [0.05, 0.45, 0.2, 0.15, 1] # Sum should be 1 but we put last to 1 to handle rounded vm values
         self.vm_mem_config       = [0.75, 1.75, 3.5, 7, 14] # In GB
@@ -45,10 +45,10 @@ class NodeGenerator(object):
 
         fun = lambda x: (cpu - x[0]*1 + x[1]*2 + x[2]*4 + x[3]*8)
         cons = [{'type': 'ineq', 'fun': lambda x:  x[0]*1 + x[1]*2 + x[2]*4 + x[3]*8 - cpu},
-                {'type': 'ineq', 'fun': lambda x:  x[0]/(np.sum(x)) - 0.6}, 
-                {'type': 'ineq', 'fun': lambda x:  x[1]/(np.sum(x)) - 0.2},
-                {'type': 'ineq', 'fun': lambda x:  x[2]/(np.sum(x)) - 0.2},
-                {'type': 'ineq', 'fun': lambda x:  x[3]/(np.sum(x)) - 0.1}]
+                {'type': 'ineq', 'fun': lambda x:  x[0]/(np.sum(x)) - 1}, # 0.5
+                {'type': 'ineq', 'fun': lambda x:  x[1]/(np.sum(x)) - 0}, # 0.2
+                {'type': 'ineq', 'fun': lambda x:  x[2]/(np.sum(x)) - 0}, # 0.2
+                {'type': 'ineq', 'fun': lambda x:  x[3]/(np.sum(x)) - 0}] # 0.1
         
         results = scipy.optimize.minimize(fun, x0=xinit, bounds=bnds, constraints=cons, method='SLSQP') # options={'disp': True}
         count = 0
