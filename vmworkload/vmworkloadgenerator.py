@@ -20,11 +20,11 @@ class VmWorkloadGenerator(object):
         print("cpu", workload_cpu_avg, "nth", workload_cpu_per)
         return workload_cpu_avg, workload_cpu_per
 
-    def __generate_periodic_distribution(self, vm : VmModel):
+    def __generate_gaussian_distribution_from_model(self, vm : VmModel):
         workload_cpu_avg, workload_cpu_per = self.__generate_avg_and_percentile(vm)
-        return self.__generate_distribution(workload_cpu_avg, workload_cpu_per)
+        return self.__generate_gaussian_distribution_from_avg(workload_cpu_avg, workload_cpu_per)
 
-    def __generate_distribution(self, workload_avg, workload_95th):
+    def __generate_gaussian_distribution_from_avg(self, workload_avg : int, workload_95th : int):
         mu, sigma = workload_avg, workload_95th
         while True:
             #print(mu, sigma)
@@ -41,27 +41,31 @@ class VmWorkloadGenerator(object):
         # plt.plot(bins, 1/(sigma * np.sqrt(2 * np.pi)) * np.exp( - (bins - mu)**2 / (2 * sigma**2) ), linewidth=2, color='r')
         # plt.show()import numpy as np
 
-    def __distribute_to_slice(self, vm : VmModel, distribution_values : list):
-        targeted_avg = distribution_values[random.randrange(len(distribution_values))]
-        return "./sshvm.sh " + getattr(vm, "vm_name") + " \""  + VmModel.generator[getattr(vm, "workload")].generate_workload(self.slice_duration, round(targeted_avg)) + "\" ; "
+    def __get_random_value_in(self, distribution_values):
+        return round(distribution_values[random.randrange(len(distribution_values))])
 
-    def __generate_nonperiodic_workload(self, vm : VmModel):
-        model_per_slice = list()
-        for i in range(self.number_of_slices_per_scope):
-            model_per_slice.append(self.__generate_periodic_distribution(vm))
+    def __distribute_to_slice(self, vm : VmModel, workload_cpu):
+        return "./sshvm.sh " + getattr(vm, "vm_name") +\
+             " \""  + VmModel.generator[getattr(vm, "workload")].generate_workload(self.slice_duration, workload_cpu) + "\" ; "
+
+    def __generate_periodic_workload(self, vm : VmModel):
+        gaussian = self.__generate_gaussian_distribution_from_model(vm=vm)
+        value_per_slice = list()
+        for j in range(self.number_of_slices_per_scope):
+            value_per_slice.append(self.__get_random_value_in(gaussian))
             
         cmd_generated = ""
         for i in range(self.number_of_scope):
             for j in range(self.number_of_slices_per_scope):
-                cmd_generated += self.__distribute_to_slice(vm, model_per_slice[j])    
+                cmd_generated += self.__distribute_to_slice(vm, value_per_slice[j])    
         return cmd_generated
 
-    def __generate_periodic_workload(self, vm : VmModel):
-        distribution_values = self.__generate_periodic_distribution(vm)
+    def __generate_nonperiodic_workload(self, vm : VmModel):
+        gaussian = self.__generate_gaussian_distribution_from_model(vm=vm)
         cmd_generated = ""
         for i in range(self.number_of_scope):
             for j in range(self.number_of_slices_per_scope):
-                cmd_generated += self.__distribute_to_slice(vm, distribution_values)
+                cmd_generated += self.__distribute_to_slice(vm, self.__get_random_value_in(gaussian))
         return cmd_generated
             
     def generate_workload_for_VM(self, vm : VmModel):
