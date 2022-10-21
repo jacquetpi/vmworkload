@@ -45,8 +45,10 @@ class VmWorkloadGenerator(object):
         return round(distribution_values[random.randrange(len(distribution_values))])
 
     def __distribute_to_slice(self, vm : VmModel, workload_cpu):
-        return "./sshvm.sh " + getattr(vm, "vm_name") +\
-             " \""  + VmModel.generator[getattr(vm, "workload")].generate_workload(self.slice_duration, workload_cpu) + "\" ; "
+        return VmModel.generator[getattr(vm, "workload")].generate_workload(
+            vm_name=getattr(vm, "vm_name"),
+            slice_duration=self.slice_duration, 
+            workload_cpu_avg=workload_cpu)
 
     def __generate_periodic_workload(self, vm : VmModel):
         gaussian = self.__generate_gaussian_distribution_from_model(vm=vm)
@@ -70,6 +72,6 @@ class VmWorkloadGenerator(object):
             
     def generate_workload_for_VM(self, vm : VmModel):
         if(getattr(vm, "diurnal")):
-            return "[periodic]" + self.__generate_periodic_workload(vm)
+            return self.__generate_periodic_workload(vm)
         else:
-            return "[notperiodic]" +self.__generate_nonperiodic_workload(vm)
+            return self.__generate_nonperiodic_workload(vm)

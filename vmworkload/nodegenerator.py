@@ -45,10 +45,10 @@ class NodeGenerator(object):
 
         fun = lambda x: (cpu - x[0]*1 + x[1]*2 + x[2]*4 + x[3]*8)
         cons = [{'type': 'ineq', 'fun': lambda x:  x[0]*1 + x[1]*2 + x[2]*4 + x[3]*8 - cpu},
-                {'type': 'ineq', 'fun': lambda x:  x[0]/(np.sum(x)) - 1}, # 0.5
-                {'type': 'ineq', 'fun': lambda x:  x[1]/(np.sum(x)) - 0}, # 0.2
-                {'type': 'ineq', 'fun': lambda x:  x[2]/(np.sum(x)) - 0}, # 0.2
-                {'type': 'ineq', 'fun': lambda x:  x[3]/(np.sum(x)) - 0}] # 0.1
+                {'type': 'ineq', 'fun': lambda x:  x[0]/(np.sum(x)) - 0.5}, # 0.5
+                {'type': 'ineq', 'fun': lambda x:  x[1]/(np.sum(x)) - 0.2}, # 0.2
+                {'type': 'ineq', 'fun': lambda x:  x[2]/(np.sum(x)) - 0.2}, # 0.2
+                {'type': 'ineq', 'fun': lambda x:  x[3]/(np.sum(x)) - 0.1}] # 0.1
         
         results = scipy.optimize.minimize(fun, x0=xinit, bounds=bnds, constraints=cons, method='SLSQP') # options={'disp': True}
         count = 0

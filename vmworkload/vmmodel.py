@@ -1,6 +1,6 @@
 from random import randrange
 from enum import Enum
-from .vmsliceworkload import VmSliceWorkloadIdle, VmSliceWorkloadStressNG, VmSliceWorkloadWordpress
+from .vmsliceworkload import *
 
 class VmWorkloadType(Enum):
     LOW = 0
@@ -10,21 +10,24 @@ class VmWorkloadType(Enum):
 
 class VmModel(object):
 
+    TOOL_FOLDER = "/usr/local/src/vmworkload/tools/"
+
     vmcount = 0
-    diurnal_workload = ["stressng", "stressng"] #,"wordpress"]
-    # nodiurnal_workload = ["idle"] + diurnal_workload
-    nodiurnal_workload = diurnal_workload
+    diurnal_workload = ["stressng", "wordpress", "dsb", "tpcc"]
+    nodiurnal_workload = ["idle"] + diurnal_workload
     generator = {"idle" : VmSliceWorkloadIdle(), 
-            "stressng" : VmSliceWorkloadStressNG(),} 
-            # "wordpress" : VmSliceWorkloadWordpress()}
+            "stressng" : VmSliceWorkloadStressNG(),
+            "wordpress" : VmSliceWorkloadWordpress(),
+            "dsb" : VmSliceWorkloadDeathStarBench(),
+            "tpcc" : VmSliceWorkloadTpcc(),
+            "tpch" : VmSliceWorkloadTpch()}
 
     def __init__(self, cpu : int, mem : int, workload_intensity : VmWorkloadType, diurnal : bool):
         VmModel.vmcount+=1
         self.vm_name="vm" + str(VmModel.vmcount)
         self.cpu=cpu
         self.mem=mem
-        #self.workload_intensity=workload_intensity
-        self.workload_intensity=VmWorkloadType.MEDIUM_HIGH
+        self.workload_intensity=workload_intensity
         self.diurnal=diurnal
         if diurnal:
             self.workload = VmModel.diurnal_workload[randrange(len(VmModel.diurnal_workload))]
@@ -35,7 +38,4 @@ class VmModel(object):
                 self.workload = VmModel.nodiurnal_workload[randrange(1,len(VmModel.nodiurnal_workload))]
 
     def get_setup_command(self):
-        if self.workload == "stressng" or self.workload == "idle":
-            return "./setupvm.sh " + self.vm_name + " " + str(self.cpu) + " " + str(round(self.mem*1024)) + " " + self.workload
-        else:
-            return "./setupvm.sh " + self.vm_name + " " + str(self.cpu) + " " + str(round(self.mem*1024)) + " " + self.workload
+        return VmModel.TOOL_FOLDER + "setupvm.sh " + self.vm_name + " " + str(self.cpu) + " " + str(round(self.mem*1024)) + " " + self.workload
