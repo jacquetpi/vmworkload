@@ -46,10 +46,13 @@ if __name__ == '__main__':
         node_generator = NodeGenerator()
         vm_list = node_generator.generate_node(cpu=cpu_config, mem=mem_config)
         if generate_setup_command:
+            i=0
             with open('setup.sh', 'w') as f:
                 for x in vm_list:
-                    f.write(x.get_setup_command())
+                    f.write("( " + x.get_setup_command() + ") &")
                     f.write('\n')
+                    if (i%10==0):
+                        f.write('sleep 900\n')
             print("Setup wrote in setup.sh")
         if generate_workload_command:
             vmworkload_generator = VmWorkloadGenerator(slice_duration=generate_workload_slice, scope_duration=generate_workload_scope, number_of_scope=3, vm_workload_details=node_generator.get_workload_details())

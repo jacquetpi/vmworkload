@@ -14,5 +14,5 @@ sed -i -- "s/<time>60/<time>${2}/g" "$config_file"
 sed -i -- "s/<rate>10000/<rate>${3}/g" "$config_file"
 echo "$config_file"
 cd /usr/local/src/benchbase
-java -jar /usr/local/src/benchbase/target/benchbase-postgres/benchbase.jar -b tpcc -c "$config_file" --execute=true
+( java -jar /usr/local/src/benchbase/target/benchbase-postgres/benchbase.jar -b tpcc -c "$config_file" --execute=true ) &
 rm "$config_file"
