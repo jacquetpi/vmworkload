@@ -49,7 +49,7 @@ class VmWorkloadGenerator(object):
             vm_name=getattr(vm, "vm_name"),
             slice_duration=self.slice_duration, 
             workload_cpu_avg=workload_cpu)
-
+            
     def __generate_periodic_workload(self, vm : VmModel):
         gaussian = self.__generate_gaussian_distribution_from_model(vm=vm)
         value_per_slice = list()

@@ -19,11 +19,11 @@ class VmSliceWorkloadIdle(VmSliceWorkload):
         data =   "sleep " + str(random_input) +  " ; " +\
                 "stress-ng --timeout " + str(peak_duration) + " -c 0 -l " + str(workload_cpu_per) + " ; " +\
                 "sleep " + str(slice_duration-random_input-peak_duration) + " ; "
-        return VmSliceWorkload.TOOL_FOLDER + VmSliceWorkload.SSH_FORMAT.replace("{name}", vm_name).replace("{data}", data)
+        return VmSliceWorkload.TOOL_FOLDER + VmSliceWorkload.SSH_FORMAT.replace("{name}", vm_name).replace("{data}", data) + " ; "
 
     def generate_workload(self, vm_name : str, slice_duration : int, workload_cpu_avg : int):
         data =  "sleep " + str(slice_duration) +  " ; "
-        return VmSliceWorkload.TOOL_FOLDER + VmSliceWorkload.SSH_FORMAT.replace("{name}", vm_name).replace("{data}", data)
+        return VmSliceWorkload.TOOL_FOLDER + VmSliceWorkload.SSH_FORMAT.replace("{name}", vm_name).replace("{data}", data) + " ; "
 
 class VmSliceWorkloadStressNG(VmSliceWorkload):
 
@@ -55,9 +55,9 @@ class VmSliceWorkloadTpcc(VmSliceWorkload):
         thresold = round(workload_cpu_avg*100)
         if thresold>20000:
             thresold = 20000
-        return VmSliceWorkload.TOOL_FOLDER + "tpcc.sh" + vm_name + " " + str(slice_duration) + " " + str(thresold) + " ; "
+        return VmSliceWorkload.TOOL_FOLDER + "tpcc.sh " + vm_name + " " + str(slice_duration) + " " + str(thresold) + " ; "
 
 class VmSliceWorkloadTpch(VmSliceWorkload):
 
     def generate_workload(self, vm_name : str, slice_duration : int, workload_cpu_avg : int):
-        return VmSliceWorkload.TOOL_FOLDER + "tpch.sh" + vm_name + " " + str(round(workload_cpu_avg*100)) + " ; "
+        return VmSliceWorkload.TOOL_FOLDER + "tpch.sh " + vm_name + " " + str(round(workload_cpu_avg*100)) + " ; "
