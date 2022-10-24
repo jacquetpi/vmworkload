@@ -18,8 +18,9 @@ if __name__ == '__main__':
     try:
         arguments, values = getopt.getopt(sys.argv[1:], short_options, long_options)
     except getopt.error as err:
-        print (str(err)) # Output error, and return with an error code
+        print(str(err))
         sys.exit(2)
+    usage = "python3 -m vmworkload [--help] [--cpu={cores}] [--mem={mo}] [--setup-cmd] [--workload-cmd={slice,scope,iteration}]"
     for current_argument, current_value in arguments:
         if current_argument in ("-c", "--cpu"):
             cpu_config = int(current_value)
@@ -32,14 +33,15 @@ if __name__ == '__main__':
             args = current_value.split(',')
             generate_workload_slice = int(args[0])
             generate_workload_scope = int(args[1])
+            generate_workload_iteration = int(args[2])
             if generate_workload_slice > generate_workload_scope:
-                print("python3 -m vmworkload [--help] [--cpu={cores}] [--mem={mo}] [--setup-cmd] [--workload-cmd={slice,scope}]")
+                print(usage)
                 raise ValueError("Model scope must be greater than slice scope")
             if generate_workload_scope % generate_workload_slice !=0:
-                print("python3 -m vmworkload [--help] [--cpu={cores}] [--mem={mo}] [--setup-cmd] [--workload-cmd={slice,scope}]")
+                print(usage)
                 raise ValueError("Model scope must be a slice multiple")
         else:
-            print("python3 -m vmworkload [--help] [--cpu={cores}] [--mem={mo}] [--setup-cmd] [--workload-cmd={slice,scope}]")
+            print(usage)
             sys.exit(0)
 
     try:
@@ -56,10 +58,10 @@ if __name__ == '__main__':
                         f.write('sleep 900\n')
             print("Setup wrote in setup.sh")
         if generate_workload_command:
-            vmworkload_generator = VmWorkloadGenerator(slice_duration=generate_workload_slice, scope_duration=generate_workload_scope, number_of_scope=4, vm_workload_details=node_generator.get_workload_details())
+            vmworkload_generator = VmWorkloadGenerator(slice_duration=generate_workload_slice, scope_duration=generate_workload_scope, number_of_scope=generate_workload_iteration, vm_workload_details=node_generator.get_workload_details())
             with open('workload.sh', 'w') as f:
                 for x in vm_list:
-                    f.write(vmworkload_generator.generate_workload_for_VM(x))
+                    f.write("( " + vmworkload_generator.generate_workload_for_VM(x) + ") &")
                     f.write('\n')
             # vmworkload_generator.generate_workload_for_VM(vm_list[0])
             # vmworkload_generator.generate_workload_for_VM(vm_list[-1])

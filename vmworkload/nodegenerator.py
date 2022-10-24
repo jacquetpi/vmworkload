@@ -6,7 +6,7 @@ class NodeGenerator(object):
 
     def __init__(self):
         # Implements parameters issued from Azure dataset
-        self.diurnal_pattern=0.3
+        self.periodic_pattern=0.3
         self.vm_workload_details = dict()
         self.vm_workload_details[VmWorkloadType.LOW] =  {"avg": (1,3), "per" : (3,25) } #per = 95th percentile
         self.vm_workload_details[VmWorkloadType.MEDIUM_LOW] =  {"avg": (3,12), "per" : (25,60)  }
@@ -86,17 +86,17 @@ class NodeGenerator(object):
     ########################
     ## Usage distribution ##
     ########################
-    def add_vms(self, current_list : list, vm_config_tuple : tuple, count : int, workload_intensity : VmWorkloadType, number_of_diurnal : int):
-        diurnal_count = 0
+    def add_vms(self, current_list : list, vm_config_tuple : tuple, count : int, workload_intensity : VmWorkloadType, number_of_periodic : int):
+        periodic_count = 0
         for x in range (count):
-            if diurnal_count < number_of_diurnal:
-                diurnal=True
-                diurnal_count+=1
+            if periodic_count < number_of_periodic:
+                periodic=True
+                periodic_count+=1
             else:
-                diurnal=False
+                periodic=False
             current_list.append(VmModel(cpu=vm_config_tuple[0], mem=vm_config_tuple[1],
                                     workload_intensity=workload_intensity,
-                                    diurnal=diurnal
+                                    periodic=periodic
                                     )
                                 )
 
@@ -119,14 +119,14 @@ class NodeGenerator(object):
         else:
             third_slice=count_per_slice
         fourth_slice=count_per_slice
-        self.add_vms(current_list=vmlist, vm_config_tuple=vm_config_tuple, count=first_slice, workload_intensity=VmWorkloadType.LOW, number_of_diurnal=round(first_slice*self.diurnal_pattern))
-        self.add_vms(current_list=vmlist, vm_config_tuple=vm_config_tuple, count=second_slice, workload_intensity=VmWorkloadType.MEDIUM_LOW, number_of_diurnal=round(second_slice*self.diurnal_pattern))
-        self.add_vms(current_list=vmlist, vm_config_tuple=vm_config_tuple, count=third_slice, workload_intensity=VmWorkloadType.MEDIUM_HIGH, number_of_diurnal=round(third_slice*self.diurnal_pattern))
-        self.add_vms(current_list=vmlist, vm_config_tuple=vm_config_tuple, count=fourth_slice, workload_intensity=VmWorkloadType.HIGH, number_of_diurnal=round(fourth_slice*self.diurnal_pattern))
-        return "\n  >" + str(first_slice) + " avg/per " + str(self.vm_workload_details[VmWorkloadType.LOW]["avg"]) + "/" + str(self.vm_workload_details[VmWorkloadType.LOW]["per"])  + " avec " + str(round(first_slice*self.diurnal_pattern)) + " diurnal" +\
-            "\n  >" + str(second_slice) + " avg/per " + str(self.vm_workload_details[VmWorkloadType.MEDIUM_LOW]["avg"]) + "/" + str(self.vm_workload_details[VmWorkloadType.MEDIUM_LOW]["per"]) + " avec " + str(round(second_slice*self.diurnal_pattern)) + " diurnal" +\
-            "\n  >" + str(third_slice) + " avg/per " + str(self.vm_workload_details[VmWorkloadType.MEDIUM_HIGH]["avg"]) + "/" + str(self.vm_workload_details[VmWorkloadType.MEDIUM_HIGH]["per"]) + " avec " + str(round(third_slice*self.diurnal_pattern)) + " diurnal" +\
-            "\n  >" + str(fourth_slice) + " avg/per " + str(self.vm_workload_details[VmWorkloadType.HIGH]["avg"]) + "/" + str(self.vm_workload_details[VmWorkloadType.HIGH]["per"]) + " avec " + str(round(fourth_slice*self.diurnal_pattern)) + " diurnal"
+        self.add_vms(current_list=vmlist, vm_config_tuple=vm_config_tuple, count=first_slice, workload_intensity=VmWorkloadType.LOW, number_of_periodic=round(first_slice*self.periodic_pattern))
+        self.add_vms(current_list=vmlist, vm_config_tuple=vm_config_tuple, count=second_slice, workload_intensity=VmWorkloadType.MEDIUM_LOW, number_of_periodic=round(second_slice*self.periodic_pattern))
+        self.add_vms(current_list=vmlist, vm_config_tuple=vm_config_tuple, count=third_slice, workload_intensity=VmWorkloadType.MEDIUM_HIGH, number_of_periodic=round(third_slice*self.periodic_pattern))
+        self.add_vms(current_list=vmlist, vm_config_tuple=vm_config_tuple, count=fourth_slice, workload_intensity=VmWorkloadType.HIGH, number_of_periodic=round(fourth_slice*self.periodic_pattern))
+        return "\n  >" + str(first_slice) + " avg/per " + str(self.vm_workload_details[VmWorkloadType.LOW]["avg"]) + "/" + str(self.vm_workload_details[VmWorkloadType.LOW]["per"])  + " avec " + str(round(first_slice*self.periodic_pattern)) + " periodic" +\
+            "\n  >" + str(second_slice) + " avg/per " + str(self.vm_workload_details[VmWorkloadType.MEDIUM_LOW]["avg"]) + "/" + str(self.vm_workload_details[VmWorkloadType.MEDIUM_LOW]["per"]) + " avec " + str(round(second_slice*self.periodic_pattern)) + " periodic" +\
+            "\n  >" + str(third_slice) + " avg/per " + str(self.vm_workload_details[VmWorkloadType.MEDIUM_HIGH]["avg"]) + "/" + str(self.vm_workload_details[VmWorkloadType.MEDIUM_HIGH]["per"]) + " avec " + str(round(third_slice*self.periodic_pattern)) + " periodic" +\
+            "\n  >" + str(fourth_slice) + " avg/per " + str(self.vm_workload_details[VmWorkloadType.HIGH]["avg"]) + "/" + str(self.vm_workload_details[VmWorkloadType.HIGH]["per"]) + " avec " + str(round(fourth_slice*self.periodic_pattern)) + " periodic"
 
     def build_usage_distribution(self, totalvm : int, vmconfiglist : list):
         count=0

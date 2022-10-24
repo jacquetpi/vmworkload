@@ -17,7 +17,7 @@ class VmWorkloadGenerator(object):
         workload = self.vm_workload_details[getattr(vm, "workload_intensity")]
         workload_cpu_avg = random.randrange(workload["avg"][0], workload["avg"][1])
         workload_cpu_per = random.randrange(workload["per"][0], workload["per"][1])
-        print("cpu", workload_cpu_avg, "nth", workload_cpu_per)
+        #print("cpu", workload_cpu_avg, "nth", workload_cpu_per)
         return workload_cpu_avg, workload_cpu_per
 
     def __generate_gaussian_distribution_from_model(self, vm : VmModel):
@@ -49,7 +49,7 @@ class VmWorkloadGenerator(object):
             vm_name=getattr(vm, "vm_name"),
             slice_duration=self.slice_duration, 
             workload_cpu_avg=workload_cpu)
-            
+
     def __generate_periodic_workload(self, vm : VmModel):
         gaussian = self.__generate_gaussian_distribution_from_model(vm=vm)
         value_per_slice = list()
@@ -71,7 +71,7 @@ class VmWorkloadGenerator(object):
         return cmd_generated
             
     def generate_workload_for_VM(self, vm : VmModel):
-        if(getattr(vm, "diurnal")):
+        if(getattr(vm, "periodic")):
             return self.__generate_periodic_workload(vm)
         else:
             return self.__generate_nonperiodic_workload(vm)
