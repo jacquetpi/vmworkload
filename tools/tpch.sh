@@ -11,4 +11,4 @@ sed -i -- "s/localhost:5432/${vm_ip}:5432/g" "$config_file"
 sed -i -- "s/<rate>unlimited/<rate>${2}/g" "$config_file"
 echo "$config_file"
 cd /usr/local/src/benchbase
-( java -jar /usr/local/src/benchbase/target/benchbase-postgres/benchbase.jar -b tpch -c "$config_file" --execute=true ) &
+java -jar /usr/local/src/benchbase/target/benchbase-postgres/benchbase.jar -b tpch -c "$config_file" --execute=true
