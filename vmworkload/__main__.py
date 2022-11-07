@@ -51,7 +51,7 @@ if __name__ == '__main__':
             i=0
             with open('setup.sh', 'w') as f:
                 for x in vm_list:
-                    f.write("( " + x.get_setup_command() + ") &")
+                    f.write("( " + x.get_setup_command() + " ) &")
                     f.write('\n')
                     i+=1
                     if (i%10==0):
@@ -61,7 +61,7 @@ if __name__ == '__main__':
             vmworkload_generator = VmWorkloadGenerator(slice_duration=generate_workload_slice, scope_duration=generate_workload_scope, number_of_scope=generate_workload_iteration, vm_workload_details=node_generator.get_workload_details())
             with open('workload.sh', 'w') as f:
                 for x in vm_list:
-                    f.write("( " + vmworkload_generator.generate_workload_for_VM(x) + ") &")
+                    f.write("( " + vmworkload_generator.generate_workload_for_VM(x) + " ) &")
                     f.write('\n')
             # vmworkload_generator.generate_workload_for_VM(vm_list[0])
             # vmworkload_generator.generate_workload_for_VM(vm_list[-1])

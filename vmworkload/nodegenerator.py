@@ -1,5 +1,6 @@
 import scipy.optimize
 import numpy as np
+from random import randrange
 from vmworkload.vmmodel import VmModel, VmWorkloadType
 
 class NodeGenerator(object):
@@ -86,12 +87,10 @@ class NodeGenerator(object):
     ########################
     ## Usage distribution ##
     ########################
-    def add_vms(self, current_list : list, vm_config_tuple : tuple, count : int, workload_intensity : VmWorkloadType, number_of_periodic : int):
-        periodic_count = 0
+    def add_vms(self, current_list : list, vm_config_tuple : tuple, count : int, workload_intensity : VmWorkloadType):
         for x in range (count):
-            if periodic_count < number_of_periodic:
+            if randrange(3) == 0: # 1/3 vm is periodic
                 periodic=True
-                periodic_count+=1
             else:
                 periodic=False
             current_list.append(VmModel(cpu=vm_config_tuple[0], mem=vm_config_tuple[1],
@@ -119,14 +118,14 @@ class NodeGenerator(object):
         else:
             third_slice=count_per_slice
         fourth_slice=count_per_slice
-        self.add_vms(current_list=vmlist, vm_config_tuple=vm_config_tuple, count=first_slice, workload_intensity=VmWorkloadType.LOW, number_of_periodic=round(first_slice*self.periodic_pattern))
-        self.add_vms(current_list=vmlist, vm_config_tuple=vm_config_tuple, count=second_slice, workload_intensity=VmWorkloadType.MEDIUM_LOW, number_of_periodic=round(second_slice*self.periodic_pattern))
-        self.add_vms(current_list=vmlist, vm_config_tuple=vm_config_tuple, count=third_slice, workload_intensity=VmWorkloadType.MEDIUM_HIGH, number_of_periodic=round(third_slice*self.periodic_pattern))
-        self.add_vms(current_list=vmlist, vm_config_tuple=vm_config_tuple, count=fourth_slice, workload_intensity=VmWorkloadType.HIGH, number_of_periodic=round(fourth_slice*self.periodic_pattern))
-        return "\n  >" + str(first_slice) + " avg/per " + str(self.vm_workload_details[VmWorkloadType.LOW]["avg"]) + "/" + str(self.vm_workload_details[VmWorkloadType.LOW]["per"])  + " avec " + str(round(first_slice*self.periodic_pattern)) + " periodic" +\
-            "\n  >" + str(second_slice) + " avg/per " + str(self.vm_workload_details[VmWorkloadType.MEDIUM_LOW]["avg"]) + "/" + str(self.vm_workload_details[VmWorkloadType.MEDIUM_LOW]["per"]) + " avec " + str(round(second_slice*self.periodic_pattern)) + " periodic" +\
-            "\n  >" + str(third_slice) + " avg/per " + str(self.vm_workload_details[VmWorkloadType.MEDIUM_HIGH]["avg"]) + "/" + str(self.vm_workload_details[VmWorkloadType.MEDIUM_HIGH]["per"]) + " avec " + str(round(third_slice*self.periodic_pattern)) + " periodic" +\
-            "\n  >" + str(fourth_slice) + " avg/per " + str(self.vm_workload_details[VmWorkloadType.HIGH]["avg"]) + "/" + str(self.vm_workload_details[VmWorkloadType.HIGH]["per"]) + " avec " + str(round(fourth_slice*self.periodic_pattern)) + " periodic"
+        self.add_vms(current_list=vmlist, vm_config_tuple=vm_config_tuple, count=first_slice, workload_intensity=VmWorkloadType.LOW)
+        self.add_vms(current_list=vmlist, vm_config_tuple=vm_config_tuple, count=second_slice, workload_intensity=VmWorkloadType.MEDIUM_LOW)
+        self.add_vms(current_list=vmlist, vm_config_tuple=vm_config_tuple, count=third_slice, workload_intensity=VmWorkloadType.MEDIUM_HIGH)
+        self.add_vms(current_list=vmlist, vm_config_tuple=vm_config_tuple, count=fourth_slice, workload_intensity=VmWorkloadType.HIGH)
+        return "\n  >" + str(first_slice) + " avg/per " + str(self.vm_workload_details[VmWorkloadType.LOW]["avg"]) + "/" + str(self.vm_workload_details[VmWorkloadType.LOW]["per"]) +\
+            "\n  >" + str(second_slice) + " avg/per " + str(self.vm_workload_details[VmWorkloadType.MEDIUM_LOW]["avg"]) + "/" + str(self.vm_workload_details[VmWorkloadType.MEDIUM_LOW]["per"]) +\
+            "\n  >" + str(third_slice) + " avg/per " + str(self.vm_workload_details[VmWorkloadType.MEDIUM_HIGH]["avg"]) + "/" + str(self.vm_workload_details[VmWorkloadType.MEDIUM_HIGH]["per"]) +\
+            "\n  >" + str(fourth_slice) + " avg/per " + str(self.vm_workload_details[VmWorkloadType.HIGH]["avg"]) + "/" + str(self.vm_workload_details[VmWorkloadType.HIGH]["per"])
 
     def build_usage_distribution(self, totalvm : int, vmconfiglist : list):
         count=0

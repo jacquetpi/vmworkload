@@ -29,11 +29,11 @@ case $4 in
 esac
 
 # Setup : clear old data
-sudo rm /var/lib/libvirt/images/"$1".qcow2
+rm /var/lib/libvirt/images/"$1".qcow2
 virsh --connect=qemu:///system destroy "$1"
 virsh --connect=qemu:///system undefine "$1"
 # Setup : install data
-sudo cp "$image" /var/lib/libvirt/images/"$1".qcow2
+cp "$image" /var/lib/libvirt/images/"$1".qcow2
 virt-install --connect qemu:///system --import --name "$1" --vcpu "$2" --memory "$3" --disk /var/lib/libvirt/images/"$1".qcow2,format=qcow2,bus=virtio --import --os-variant ubuntu20.04 --network default --virt-type kvm --noautoconsole --check path_in_use=off
 # Setup : statistics
 virsh --connect qemu:///system dommemstat "$1" --period 1
