@@ -1,12 +1,12 @@
-import getopt, sys
-from vmworkload.vmmodel import VmModel, VmWorkloadType
+import getopt, sys, json
+from vmworkload.vmmodel import *
 from vmworkload.nodegenerator import NodeGenerator
 from vmworkload.vmworkloadgenerator import VmWorkloadGenerator
 
 if __name__ == '__main__':
 
-    short_options = "hsw:c:m:"
-    long_options = ["help","setup-cmd", "workload-cmd=", "cpu=","mem="]
+    short_options = "hsw:c:m:l:"
+    long_options = ["help","setup-cmd", "workload-cmd=", "cpu=", "mem=", "load="]
     debug = 0
     
     cpu_config = 256*2
@@ -14,13 +14,14 @@ if __name__ == '__main__':
     generate_setup_command=False
     generate_workload_command=False
     generate_workload_slice=0
+    loaded_config=False
 
     try:
         arguments, values = getopt.getopt(sys.argv[1:], short_options, long_options)
     except getopt.error as err:
         print(str(err))
         sys.exit(2)
-    usage = "python3 -m vmworkload [--help] [--cpu={cores}] [--mem={mo}] [--setup-cmd] [--workload-cmd={slice,scope,iteration}]"
+    usage = "python3 -m vmworkload [--help] [--cpu={cores}] [--mem={mo}] [--setup-cmd] [--load=] [--workload-cmd={slice,scope,iteration}]"
     for current_argument, current_value in arguments:
         if current_argument in ("-c", "--cpu"):
             cpu_config = int(current_value)
@@ -40,13 +41,25 @@ if __name__ == '__main__':
             if generate_workload_scope % generate_workload_slice !=0:
                 print(usage)
                 raise ValueError("Model scope must be a slice multiple")
+        elif current_argument in ("-l", "--load"):
+            with open(current_value, 'r') as f:
+                loaded_config=True
+                raw_list = json.load(f)
+                vm_list = list()
+                for raw_vm in raw_list:
+                    vm_list.append(VmModel(cpu=raw_vm["cpu"], mem=raw_vm["mem"],
+                                    workload_intensity=raw_vm["workload_intensity"],
+                                    periodic=raw_vm["periodic"], vm_name=raw_vm["vm_name"], workload=raw_vm["workload"]
+                                    )
+                                )
         else:
             print(usage)
             sys.exit(0)
 
     try:
         node_generator = NodeGenerator()
-        vm_list = node_generator.generate_node(cpu=cpu_config, mem=mem_config)
+        if not loaded_config:
+            vm_list = node_generator.generate_node(cpu=cpu_config, mem=mem_config)
         if generate_setup_command:
             i=0
             with open('setup.sh', 'w') as f:
@@ -56,15 +69,15 @@ if __name__ == '__main__':
                     i+=1
                     if (i%10==0):
                         f.write('sleep 900\n')
-            print("Setup wrote in setup.sh")
+            with open("node-specifications.json", 'w') as f:
+                f.write(json.dumps(vm_list, cls=VmModelEncoder))
+            print("Setup wrote in setup.sh and specification in node-specifications.json")
         if generate_workload_command:
             vmworkload_generator = VmWorkloadGenerator(slice_duration=generate_workload_slice, scope_duration=generate_workload_scope, number_of_scope=generate_workload_iteration, vm_workload_details=node_generator.get_workload_details())
             with open('workload.sh', 'w') as f:
                 for x in vm_list:
                     f.write("( " + vmworkload_generator.generate_workload_for_VM(x) + " ) &")
                     f.write('\n')
-            # vmworkload_generator.generate_workload_for_VM(vm_list[0])
-            # vmworkload_generator.generate_workload_for_VM(vm_list[-1])
             print("Workload wrote in workload.sh")
     except KeyboardInterrupt:
         print("Program interrupted")

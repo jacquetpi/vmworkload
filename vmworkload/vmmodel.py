@@ -1,8 +1,10 @@
 from random import randrange
 from enum import Enum
 from .vmsliceworkload import *
+import json
+from json import JSONEncoder
 
-class VmWorkloadType(Enum):
+class VmWorkloadType(str, Enum):
     LOW = 0
     MEDIUM_LOW = 1
     MEDIUM_HIGH = 2
@@ -13,8 +15,8 @@ class VmModel(object):
     TOOL_FOLDER = "/usr/local/src/vmworkload/tools/"
 
     vmcount = 0
-    periodic_workload = ["stressng", "wordpress", "dsb", "tpcc"]
-    notperiodic_workload = ["idle"] + periodic_workload
+    periodic_workload = ["dsb", "wordpress", "stressng", "tpcc"]
+    notperiodic_workload = periodic_workload + ["idle"]
     generator = {"idle" : VmSliceWorkloadIdle(), 
             "stressng" : VmSliceWorkloadStressNG(),
             "wordpress" : VmSliceWorkloadWordpress(),
@@ -22,22 +24,37 @@ class VmModel(object):
             "tpcc" : VmSliceWorkloadTpcc(),
             "tpch" : VmSliceWorkloadTpch()}
 
-    def __init__(self, cpu : int, mem : int, workload_intensity : VmWorkloadType, periodic : bool):
+    def __init__(self, cpu : int, mem : int, workload_intensity : VmWorkloadType, periodic : bool, workload = None, vm_name=None):
         VmModel.vmcount+=1
-        self.vm_name="vm" + str(VmModel.vmcount)
+        if vm_name==None:
+            self.vm_name="vm" + str(VmModel.vmcount)
+        else:
+            self.vm_name=vm_name
         self.cpu=cpu
         self.mem=mem
         self.workload_intensity=workload_intensity
         self.periodic=periodic
+        if workload!=None:
+            self.workload=workload
+            return
+        if self.mem < 7: # GB : dsb needs more memory so we exclude it from range
+            workload_range_index=1
+        else:
+            workload_range_index=0
+        # Choose workload randomly
         if self.periodic:
-            self.workload = VmModel.periodic_workload[randrange(len(VmModel.periodic_workload))]
+            self.workload = VmModel.periodic_workload[randrange(workload_range_index, len(VmModel.periodic_workload))]
             self.vm_name+= "-periodic"
         else:
             self.vm_name+= "-notperiodic"
             if workload_intensity == VmWorkloadType.LOW:
-                self.workload = VmModel.notperiodic_workload[0]
+                self.workload = VmModel.notperiodic_workload[-1] # idle
             else:
-                self.workload = VmModel.notperiodic_workload[randrange(1,len(VmModel.notperiodic_workload))]
+                self.workload = VmModel.notperiodic_workload[randrange(workload_range_index, len(VmModel.notperiodic_workload)-1)]
 
     def get_setup_command(self):
         return VmModel.TOOL_FOLDER + "setupvm.sh " + self.vm_name + " " + str(self.cpu) + " " + str(round(self.mem*1024)) + " " + self.workload
+
+class VmModelEncoder(JSONEncoder):
+    def default(self, o):
+        return o.__dict__  
