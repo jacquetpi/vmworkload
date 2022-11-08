@@ -33,11 +33,11 @@ class VmSliceWorkloadStressNG(VmSliceWorkload):
         data =   "stress-ng --timeout " + str(random_input) +  " -c 0 -l " + str(workload_cpu_avg) + " ; " +\
                 "stress-ng --timeout " + str(peak_duration) + " -c 0 -l " + str(workload_cpu_per) + " ; " +\
                 "stress-ng --timeout " + str(slice_duration-random_input-peak_duration) +  " -c 0 -l " + str(workload_cpu_avg) + " ; "
-        return VmSliceWorkload.TOOL_FOLDER + VmSliceWorkload.SSH_FORMAT.replace("{name}", vm_name).replace("{data}", data)
+        return VmSliceWorkload.TOOL_FOLDER + VmSliceWorkload.SSH_FORMAT.replace("{name}", vm_name).replace("{data}", data) + " ; "
 
     def generate_workload(self, vm_name : str, slice_duration : int, workload_cpu_avg : int):
         data =  "stress-ng --timeout " + str(slice_duration) +  " -c 0 -l " + str(workload_cpu_avg) + " ; "
-        return VmSliceWorkload.TOOL_FOLDER + VmSliceWorkload.SSH_FORMAT.replace("{name}", vm_name).replace("{data}", data)
+        return VmSliceWorkload.TOOL_FOLDER + VmSliceWorkload.SSH_FORMAT.replace("{name}", vm_name).replace("{data}", data) + " ; "
 
 class VmSliceWorkloadWordpress(VmSliceWorkload):
 
