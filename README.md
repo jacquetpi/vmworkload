@@ -10,3 +10,4 @@ cd benchbase
 ./mvnw clean package -P postgres
 cd target
 tar xvzf benchbase-postgres.tgz
+With basic scripts : sudo docker in visudo
