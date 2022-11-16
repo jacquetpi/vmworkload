@@ -205,3 +205,4 @@ pip-selfcheck.json
 ### Custom ###
 setup.sh
 workload.sh
+node-specifications.json
