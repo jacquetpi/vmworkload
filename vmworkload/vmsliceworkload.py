@@ -1,4 +1,5 @@
 import random
+import math
 
 class VmSliceWorkload(object):
 
@@ -42,17 +43,17 @@ class VmSliceWorkloadStressNG(VmSliceWorkload):
 class VmSliceWorkloadWordpress(VmSliceWorkload):
 
     def generate_workload(self, vm_name : str, slice_duration : int, workload_cpu_avg : int):
-        return VmSliceWorkload.TOOL_FOLDER + "siege.sh " + vm_name + " " + str(slice_duration) + " " + str(round(workload_cpu_avg/10)) + " ; "
+        return VmSliceWorkload.TOOL_FOLDER + "siege.sh " + vm_name + " " + str(slice_duration) + " " + str(math.ceil(workload_cpu_avg/10)) + " ; "
 
 class VmSliceWorkloadDeathStarBench(VmSliceWorkload):
 
     def generate_workload(self, vm_name : str, slice_duration : int, workload_cpu_avg : int):
-        return VmSliceWorkload.TOOL_FOLDER + "wrk2.sh " + vm_name + " " + str(slice_duration) + " " + str(round(workload_cpu_avg*100)) + " ; "
+        return VmSliceWorkload.TOOL_FOLDER + "wrk2.sh " + vm_name + " " + str(slice_duration) + " " + str(math.ceil(workload_cpu_avg*100)) + " ; "
 
 class VmSliceWorkloadTpcc(VmSliceWorkload):
 
     def generate_workload(self, vm_name : str, slice_duration : int, workload_cpu_avg : int):
-        thresold = round(workload_cpu_avg*100)
+        thresold = math.ceil(workload_cpu_avg*100)
         if thresold>20000:
             thresold = 20000
         return VmSliceWorkload.TOOL_FOLDER + "tpcc.sh " + vm_name + " " + str(slice_duration) + " " + str(thresold) + " ; "
@@ -60,4 +61,4 @@ class VmSliceWorkloadTpcc(VmSliceWorkload):
 class VmSliceWorkloadTpch(VmSliceWorkload):
 
     def generate_workload(self, vm_name : str, slice_duration : int, workload_cpu_avg : int):
-        return VmSliceWorkload.TOOL_FOLDER + "tpch.sh " + vm_name + " " + str(round(workload_cpu_avg*100)) + " ; "
+        return VmSliceWorkload.TOOL_FOLDER + "tpch.sh " + vm_name + " " + str(math.ceil(workload_cpu_avg*100)) + " ; "
