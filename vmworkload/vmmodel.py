@@ -44,9 +44,9 @@ class VmModel(object):
         # Choose workload randomly
         if self.periodic:
             self.workload = VmModel.periodic_workload[randrange(workload_range_index, len(VmModel.periodic_workload))]
-            self.vm_name+= "-periodic"
+            self.vm_name+= "periodic"
         else:
-            self.vm_name+= "-notperiodic"
+            self.vm_name+= "notperiodic"
             if workload_intensity == VmWorkloadType.LOW:
                 self.workload = VmModel.notperiodic_workload[-1] # idle
             else:
