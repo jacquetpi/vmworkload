@@ -58,6 +58,7 @@ do
   fi
 done
 # Post action : Execute
+sleep 300 # May not be fully initialized
 case $4 in
   "wordpress")
     payload="sleep 10 && ./changewpip.sh ${vm_ip}"
