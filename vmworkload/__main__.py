@@ -68,7 +68,7 @@ if __name__ == '__main__':
                     f.write('\n')
                     i+=1
                     if (i%10==0):
-                        f.write('sleep 900\n')
+                        f.write('sleep 1200\n')
             with open("node-specifications.json", 'w') as f:
                 f.write(json.dumps(vm_list, cls=VmModelEncoder))
             print("Setup wrote in setup.sh and specification in node-specifications.json")

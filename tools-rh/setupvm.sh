@@ -57,7 +57,8 @@ do
     break
   fi
 done
-# Post action : Execute
+sleep 300 # May not be fully initialized
+# Post action : Install specific workload
 case $4 in
   "wordpress")
     payload="sleep 10 && ./changewpip.sh ${vm_ip}"
