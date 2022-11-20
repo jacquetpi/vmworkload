@@ -13,6 +13,12 @@ class VmWorkloadGenerator(object):
 
         self.vm_workload_details=vm_workload_details
 
+    def __get_vm_identifier(self, vm : VmModel, remote : bool):
+        if remote:
+            return "${remoteip}:" + str(vm.get_host_port())
+        else:
+            return vm.get_name()
+
     def __generate_avg_and_percentile(self, vm : VmModel):
         workload = self.vm_workload_details[getattr(vm, "workload_intensity")]
         workload_cpu_avg = random.randrange(workload["avg"][0], workload["avg"][1])
@@ -44,13 +50,13 @@ class VmWorkloadGenerator(object):
     def __get_random_value_in(self, distribution_values):
         return round(distribution_values[random.randrange(len(distribution_values))])
 
-    def __distribute_to_slice(self, vm : VmModel, workload_cpu):
+    def __distribute_to_slice(self, vm : VmModel, workload_cpu, remote : bool = False):
         return VmModel.generator[getattr(vm, "workload")].generate_workload(
-            vm_name=getattr(vm, "vm_name"),
+            vm_identifier=self.__get_vm_identifier(vm=vm, remote=remote),
             slice_duration=self.slice_duration, 
             workload_cpu_avg=workload_cpu)
 
-    def __generate_periodic_workload(self, vm : VmModel):
+    def __generate_periodic_workload(self, vm : VmModel, remote : bool = False):
         gaussian = self.__generate_gaussian_distribution_from_model(vm=vm)
         value_per_slice = list()
         for j in range(self.number_of_slices_per_scope):
@@ -59,19 +65,19 @@ class VmWorkloadGenerator(object):
         cmd_generated = ""
         for i in range(self.number_of_scope):
             for j in range(self.number_of_slices_per_scope):
-                cmd_generated += self.__distribute_to_slice(vm, value_per_slice[j])    
+                cmd_generated += self.__distribute_to_slice(vm, value_per_slice[j],remote=remote)    
         return cmd_generated
 
-    def __generate_nonperiodic_workload(self, vm : VmModel):
+    def __generate_nonperiodic_workload(self, vm : VmModel, remote : bool = False):
         gaussian = self.__generate_gaussian_distribution_from_model(vm=vm)
         cmd_generated = ""
         for i in range(self.number_of_scope):
             for j in range(self.number_of_slices_per_scope):
-                cmd_generated += self.__distribute_to_slice(vm, self.__get_random_value_in(gaussian))
+                cmd_generated += self.__distribute_to_slice(vm, self.__get_random_value_in(gaussian), remote=remote)
         return cmd_generated
             
-    def generate_workload_for_VM(self, vm : VmModel):
+    def generate_workload_for_VM(self, vm : VmModel, remote : bool = False):
         if(getattr(vm, "periodic")):
-            return self.__generate_periodic_workload(vm)
+            return self.__generate_periodic_workload(vm=vm, remote=remote)
         else:
-            return self.__generate_nonperiodic_workload(vm)
+            return self.__generate_nonperiodic_workload(vm=vm, remote=remote)

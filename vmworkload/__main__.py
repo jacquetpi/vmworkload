@@ -72,12 +72,31 @@ if __name__ == '__main__':
             with open("node-specifications.json", 'w') as f:
                 f.write(json.dumps(vm_list, cls=VmModelEncoder))
             print("Setup wrote in setup.sh and specification in node-specifications.json")
+
         if generate_workload_command:
             vmworkload_generator = VmWorkloadGenerator(slice_duration=generate_workload_slice, scope_duration=generate_workload_scope, number_of_scope=generate_workload_iteration, vm_workload_details=node_generator.get_workload_details())
-            with open('workload.sh', 'w') as f:
+            with open('workloadlocal.sh', 'w') as f:
                 for x in vm_list:
-                    f.write("( " + vmworkload_generator.generate_workload_for_VM(x) + " ) &")
+                    f.write("( " + vmworkload_generator.generate_workload_for_VM(vm=x) + " ) &")
                     f.write('\n')
-            print("Workload wrote in workload.sh")
+            print("Workload wrote in workloadlocal.sh")
+
+            with open('workloadremote.sh', 'w') as f:
+                f.write("if (( \"$#\" != \"1\" ))\n")
+                f.write("then\n")
+                f.write("echo \"Missing argument : ./workloadremote.sh remoteipe\"\n")
+                f.write("exit -1\n")
+                f.write("fi\n")
+                f.write("remoteip=\"$1\"\n")
+                for x in vm_list:
+                    f.write("( " + vmworkload_generator.generate_workload_for_VM(vm=x,remote=True) + " ) &")
+                    f.write('\n')
+
+            with open('workloadremote-setup.sh', 'w') as f:
+                f.write("sudo firewall-cmd --reload\n")
+                for x in vm_list:
+                    f.write("( " + x.get_nat_setup_command() + " ) &")
+                    f.write('\n')
+
     except KeyboardInterrupt:
         print("Program interrupted")

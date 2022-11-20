@@ -12,7 +12,7 @@ class VmWorkloadType(str, Enum):
 
 class VmModel(object):
 
-    TOOL_FOLDER = "/usr/local/src/vmworkload/tools/"
+    TOOL_FOLDER = "tools/"
 
     vmcount = 0
     periodic_workload = ["dsb", "wordpress", "stressng", "tpcc"]
@@ -30,6 +30,7 @@ class VmModel(object):
             self.vm_name="vm" + str(VmModel.vmcount)
         else:
             self.vm_name=vm_name
+        self.host_port = 11000 + VmModel.vmcount # if required for remote workload
         self.cpu=cpu
         self.mem=mem
         self.workload_intensity=workload_intensity
@@ -55,6 +56,15 @@ class VmModel(object):
     def get_setup_command(self):
         return VmModel.TOOL_FOLDER + "setupvm.sh " + self.vm_name + " " + str(self.cpu) + " " + str(round(self.mem*1024)) + " " + self.workload
 
+    def get_nat_setup_command(self):
+        return VmModel.TOOL_FOLDER + "setupvmnat.sh " + self.vm_name + " " + self.workload + " " + str(self.host_port)
+
+    def get_name(self):
+        return self.vm_name
+
+    def get_host_port(self):
+        return self.host_port
+        
 class VmModelEncoder(JSONEncoder):
     def default(self, o):
         return o.__dict__  

@@ -1,4 +1,5 @@
 #!/bin/bash
+pathbase="/var/lib/libvirt/images"
 if (( "$#" != "4" )) 
 then
   echo -n "Missing argument : ./setupvm.sh name core mem image"
@@ -7,19 +8,19 @@ fi
 image=""
 case $4 in
   "idle" | "stressng" | "dsb")
-    image="/var/lib/libvirt/images/baseline-ubuntu20-04.qcow2"
+    image="${pathbase}/baseline-ubuntu20-04.qcow2"
     ;;
 
   "wordpress")
-    image="/var/lib/libvirt/images/baseline-ubuntu20-04-wp.qcow2"
+    image="${pathbase}/baseline-ubuntu20-04-wp.qcow2"
     ;;
 
   "tpcc")
-    image="/var/lib/libvirt/images/baseline-ubuntu20-04-tpcc.qcow2"
+    image="${pathbase}/baseline-ubuntu20-04-tpcc.qcow2"
     ;;
 
   "tpch")
-    image="/var/lib/libvirt/images/baseline-ubuntu20-04-tpch.qcow2"
+    image="${pathbase}/baseline-ubuntu20-04-tpch.qcow2"
     ;;
 
   *)
@@ -29,12 +30,12 @@ case $4 in
 esac
 
 # Setup : clear old data
-rm /var/lib/libvirt/images/"$1".qcow2
+rm ${pathbase}/"$1".qcow2
 virsh --connect=qemu:///system destroy "$1"
 virsh --connect=qemu:///system undefine "$1"
 # Setup : install data
-cp "$image" /var/lib/libvirt/images/"$1".qcow2
-virt-install --connect qemu:///system --import --name "$1" --vcpu "$2" --memory "$3" --disk /var/lib/libvirt/images/"$1".qcow2,format=qcow2,bus=virtio --import --os-variant ubuntu20.04 --network default --virt-type kvm --noautoconsole --check path_in_use=off
+cp "$image" ${pathbase}/"$1".qcow2
+virt-install --connect qemu:///system --import --name "$1" --vcpu "$2" --memory "$3" --disk ${pathbase}/"$1".qcow2,format=qcow2,bus=virtio --import --os-variant ubuntu20.04 --network default --virt-type kvm --noautoconsole --check path_in_use=off
 # Setup : statistics
 virsh --connect qemu:///system dommemstat "$1" --period 1
 # Setup : core pining
