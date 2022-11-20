@@ -1,6 +1,10 @@
 # Created by https://www.toptal.com/developers/gitignore/api/pythonvanilla,venv,python
 # Edit at https://www.toptal.com/developers/gitignore?templates=pythonvanilla,venv,python
 
+#Misc
+workload*.sh
+setup*.sh
+
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
