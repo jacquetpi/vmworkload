@@ -8,5 +8,4 @@ else
   ip="$fullip"
   port="22"
 fi
-echo "$ip $port"
 ssh vmtornado@"${ip}" -p "$port" -o StrictHostKeyChecking=no "$2" 

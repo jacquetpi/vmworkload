@@ -95,7 +95,7 @@ if __name__ == '__main__':
             with open('workloadremote-setup.sh', 'w') as f:
                 f.write("sudo firewall-cmd --reload\n")
                 for x in vm_list:
-                    f.write("( " + x.get_nat_setup_command() + " ) &")
+                    f.write(x.get_nat_setup_command())
                     f.write('\n')
 
     except KeyboardInterrupt:

@@ -22,12 +22,13 @@ case $2 in
     exit -1
     ;;
 esac
-while sleep 10;
+while true;
 do
   vm_ip=$( virsh --connect=qemu:///system domifaddr "$1" | tail -n 2 | head -n 1 | awk '{ print $4 }' | sed 's/[/].*//' );
   if [ -n "$vm_ip" ]; then #VAR is set to a non-empty string
     break
   fi
+  sleep 10
 done
 sudo firewall-cmd --add-forward-port=port=$3:proto=tcp:toaddr=$vm_ip:toport=$dport
 echo "setup nating for $1 on port $3 for $vm_ip:$dport on workload $2"
