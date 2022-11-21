@@ -9,7 +9,7 @@ case $2 in
     dport="22"
     ;;
   "wordpress")
-    dport="80"
+    dport="22"
     ;;
   "dsb")
     dport="8080"
