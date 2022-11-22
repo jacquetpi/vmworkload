@@ -97,6 +97,8 @@ if __name__ == '__main__':
                 for x in vm_list:
                     f.write(x.get_nat_setup_command())
                     f.write('\n')
+                f.write("sudo firewall-cmd --direct --add-rule ipv4 nat POSTROUTING 0 -j MASQUERADE\n")
+                f.write("sudo firewall-cmd --direct --add-rule ipv4 filter FORWARD 0 -d 0.0.0.0/0 -j ACCEPT\n")
 
     except KeyboardInterrupt:
         print("Program interrupted")
