@@ -18,7 +18,7 @@ case $2 in
     dport="22"
     ;;
   "wordpress")
-    dport="22"
+    dport="$sport"
     # Supplementary step : 
     ssh vmtornado@"${vm_ip}" -o StrictHostKeyChecking=no "./changewpip.sh ${vm_ip}:${sport}"
     ;;
