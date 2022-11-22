@@ -5,6 +5,7 @@
 workload*.sh
 setup*.sh
 tornado/
+dump/
 node-specifications.json
 
 ### Python ###
