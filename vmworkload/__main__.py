@@ -94,11 +94,11 @@ if __name__ == '__main__':
 
             with open('workloadremote-setup.sh', 'w') as f:
                 f.write("sudo firewall-cmd --reload\n")
+                f.write("sudo firewall-cmd --direct --add-rule ipv4 nat POSTROUTING 0 -j MASQUERADE\n")
                 f.write("sudo firewall-cmd --direct --add-rule ipv4 filter FORWARD 0 -d 0.0.0.0/0 -j ACCEPT\n")
                 for x in vm_list:
                     f.write(x.get_nat_setup_command())
                     f.write('\n')
-                f.write("sudo firewall-cmd  --direct --add-masquerade\n")
 
     except KeyboardInterrupt:
         print("Program interrupted")

@@ -12,7 +12,7 @@ then
   ip=$(echo $fullip | cut -d : -f 1)
   port=$(echo $fullip | cut -d : -f 2)
   # temporary workaround
-  ssh vmtornado@"${ip}" -p "$port" -o StrictHostKeyChecking=no -L ${port}:localhost:80 "sleep ${timeout}" 
+  ssh vmtornado@"${ip}" -p "$port" -o StrictHostKeyChecking=no -L ${port}:localhost:80 "sleep ${timeout}"  &
   siege --time="$timeout"s --concurrent="$concurrent" --delay=1 http://localhost:${port}/
 else
   ip="$fullip"

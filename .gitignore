@@ -5,6 +5,7 @@
 workload*.sh
 setup*.sh
 tornado/
+node-specifications.json
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
