@@ -8,7 +8,7 @@ else
   ip="$fullip"
   port="22"
 fi
-output=$( ssh vmtornado@"${ip}" -p "$port" -o StrictHostKeyChecking=no "$2" )
+output=$( ssh vmtornado@"${ip}" -p "$port" -o StrictHostKeyChecking=no "$2" 2>&1 )
 epoch=$( date +%s%N )
 fileoutput="${1}-${epoch}-ssh.txt"
-printf "$output" > "dump/${fileoutput}"
+echo -n "$output" > "dump/${fileoutput}"

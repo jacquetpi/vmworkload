@@ -20,8 +20,8 @@ sed -i -- "s/localhost:5432/${ip}:"${port}"/g" "$config_file"
 sed -i -- "s/<rate>unlimited/<rate>${2}/g" "$config_file"
 location=$( pwd )
 cd /usr/local/src/benchbase
-output=$( java -jar /usr/local/src/benchbase/target/benchbase-postgres/benchbase.jar -b tpch -c "$config_file" --execute=true )
+output=$( java -jar /usr/local/src/benchbase/target/benchbase-postgres/benchbase.jar -b tpch -c "$config_file" --execute=true 2>&1 )
 epoch=$( date +%s%N )
 fileoutput="${1}-${epoch}-tpch.txt"
 cd "$location"
-printf "$output" > "dump/${fileoutput}"
+echo -n "$output" > "dump/${fileoutput}"

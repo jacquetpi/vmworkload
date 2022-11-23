@@ -13,7 +13,7 @@ else
   ip="$fullip"
   port="8080"
 fi
-output=$( sudo docker run --net=host pjacquet/dsb-socialnetwork-wrk2 -D exp -t 2 -c 20 -d "$2" -L -s ./scripts/social-network/read-home-timeline.lua http://"${ip}":"${port}"/wrk2-api/home-timeline/read -R $3 )
+output=$( sudo docker run --net=host pjacquet/dsb-socialnetwork-wrk2 -D exp -t 2 -c 20 -d "$2" -L -s ./scripts/social-network/read-home-timeline.lua http://"${ip}":"${port}"/wrk2-api/home-timeline/read -R $3 2>&1 )
 epoch=$( date +%s%N )
 fileoutput="${1}-${epoch}-wrk2.txt"
-printf "$output" > "dump/${fileoutput}"
+echo -n "$output" > "dump/${fileoutput}"
