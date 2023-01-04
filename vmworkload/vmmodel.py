@@ -34,7 +34,7 @@ class VmModel(object):
         self.cpu=cpu
         self.mem=mem
         self.workload_intensity=workload_intensity
-        self.periodic=False # periodic
+        self.periodic=periodic # periodic
         if workload!=None:
             self.workload=workload
             return
