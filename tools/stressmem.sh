@@ -4,6 +4,7 @@ then
   echo "stressmem.sh Missing argument : ./stressmem.sh vm timeout percent"
   exit -1
 fi
+# remote with stress-ng --vm-bytes $(awk '/MemAvailable/{printf "%d\n", $2 * 0.9;}' < /proc/meminfo)k --vm-keep -m 1
 vm=$1
 timeout=$2
 percent=$3

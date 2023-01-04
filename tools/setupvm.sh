@@ -63,6 +63,10 @@ sleep 300 # May not be fully initialized
 case $4 in
   "wordpress")
     payload="sleep 10 && ./changewpip.sh ${vm_ip}"
+    if [[ ${fullip} != *":"* ]];
+    then
+      payload="$payload && sudo firewall-cmd --zone=public --add-port=80/tcp --permanent && sudo firewall-cmd --reload"
+    fi
     ;;
   "dsb")
     payload="sleep 10 && cd /usr/local/src/DeathStarBench-master/socialNetwork/ && docker-compose up -d && sleep 60 && python3 scripts/init_social_graph.py --graph=socfb-Reed98"

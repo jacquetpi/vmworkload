@@ -15,8 +15,8 @@ class VmModel(object):
     TOOL_FOLDER = "tools/"
 
     vmcount = 0
-    periodic_workload = ["dsb", "wordpress", "stressng", "tpcc"]
-    notperiodic_workload = periodic_workload + ["idle"]
+    notperiodic_workload = ["dsb", "wordpress", "stressng", "tpcc"] 
+    periodic_workload = notperiodic_workload + ["idle"]
     generator = {"idle" : VmSliceWorkloadIdle(), 
             "stressng" : VmSliceWorkloadStressNG(),
             "wordpress" : VmSliceWorkloadWordpress(),
@@ -34,7 +34,7 @@ class VmModel(object):
         self.cpu=cpu
         self.mem=mem
         self.workload_intensity=workload_intensity
-        self.periodic=periodic
+        self.periodic=False # periodic
         if workload!=None:
             self.workload=workload
             return
@@ -44,14 +44,15 @@ class VmModel(object):
             workload_range_index=0
         # Choose workload randomly
         if self.periodic:
-            self.workload = VmModel.periodic_workload[randrange(workload_range_index, len(VmModel.periodic_workload))]
             self.vm_name+= "periodic"
+            if workload_intensity == VmWorkloadType.LOW:
+                self.workload = VmModel.periodic_workload[-1] # idle
+            else:
+                self.workload = VmModel.periodic_workload[randrange(workload_range_index, len(VmModel.periodic_workload)-1)]
         else:
             self.vm_name+= "notperiodic"
-            if workload_intensity == VmWorkloadType.LOW:
-                self.workload = VmModel.notperiodic_workload[-1] # idle
-            else:
-                self.workload = VmModel.notperiodic_workload[randrange(workload_range_index, len(VmModel.notperiodic_workload)-1)]
+            self.workload = VmModel.periodic_workload[randrange(workload_range_index, len(VmModel.notperiodic_workload))]
+                
 
     def get_setup_command(self):
         return VmModel.TOOL_FOLDER + "setupvm.sh " + self.vm_name + " " + str(self.cpu) + " " + str(round(self.mem*1024)) + " " + self.workload
